@@ -1,0 +1,25 @@
+{
+    "endpoint": "https://echo.zuplo.io",
+    "requests": [
+        {
+            "method": "post",
+            "code": 400,
+            "response-file": "./test-response.txt"
+        },
+        {
+            "method": "post",
+            "code": 400,
+            "response-file": "./test-response.txt"
+        },
+        {
+            "method": "post",
+            "code": 400,
+            "response": "asd"
+        },
+        {
+            "method": "post",
+            "code": 400,
+            "response-file": "./test-response.txt"
+        }
+    ]
+}
