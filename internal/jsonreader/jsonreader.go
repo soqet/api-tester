@@ -2,9 +2,9 @@ package jsonreader
 
 import (
 	"bytes"
+	jsoniter "github.com/json-iterator/go"
 	"os"
 	"path/filepath"
-	jsoniter "github.com/json-iterator/go"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
