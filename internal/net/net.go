@@ -77,7 +77,7 @@ func execRequests(
 		}
 		if resp.StatusCode != req.Code {
 			res.Passed = false
-			res.Reason = "Wrong code"
+			res.Reason = "Wrong status code"
 			res.Code = resp.StatusCode
 			results <- res
 			continue
@@ -93,7 +93,7 @@ func execRequests(
 		}
 		if !bytes.Equal(httpBuf.Bytes(), testResp) {
 			res.Passed = false
-			res.Reason = "Wrong body"
+			res.Reason = "Wrong response body"
 			res.Response = httpBuf.String()
 		}
 		results <- res
