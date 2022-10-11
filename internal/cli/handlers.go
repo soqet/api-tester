@@ -10,11 +10,7 @@ import (
 )
 
 func handleTest(cctx *cli.Context) error {
-	filename := "./test.json"
-	if cctx.String("file") != "" {
-		filename = cctx.String("file")
-	}
-
+	filename := cctx.String("file")
 	task, err := jr.ReadFile(filename)
 	if err != nil {
 		return err

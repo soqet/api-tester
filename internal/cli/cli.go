@@ -18,8 +18,8 @@ func initCommands() *cli.App {
 					&cli.StringFlag{
 						Name:    "file",
 						Aliases: []string{"f"},
-						Value:   "",
-						Usage:   "file name",
+						Value:   "./test.json",
+						Usage:   "path to json, default is ",
 					},
 				},
 			},

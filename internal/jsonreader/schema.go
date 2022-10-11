@@ -7,7 +7,7 @@ type MainSchema struct {
 	Headers []*HeaderSchema `json:"headers"`
 	// groups of requests
 	Groups []*GroupSchema `json:"groups"`
-	// requests without groups
+	// non group requests
 	Requests []*RequestSchema `json:"requests"`
 }
 
@@ -34,13 +34,15 @@ type RequestSchema struct {
 	Resourse string `json:"resourse"`
 	// request body
 	Body string `json:"body"`
-	// file containing body
+	// text file containing body
+	// igores Body if not empty
 	BodyFile string `json:"body-file"`
 	// response code
 	Code int `json:"code"`
 	// response body
 	Response string `json:"response"`
-	// file containing response
+	// text file containing response body
+	// igores Response if not empty
 	ResponseFile string `json:"response-file"`
 }
 
