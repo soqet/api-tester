@@ -1,25 +1,42 @@
 {
-    "endpoint": "https://echo.zuplo.io",
+    "endpoint": "https://example.com",
     "requests": [
         {
-            "method": "post",
-            "code": 400,
-            "response-file": "./test-response.txt"
+            "method": "get",
+            "code": 200,
+            "response-file": "./examplecom.html"
+        }
+    ],
+    "groups": [
+        {
+            "endpoint": "https://echo.zuplo.io",
+            "requests": [
+                {
+                    "method": "post",
+                    "code": 400,
+                    "response-file": "./test-response.html"
+                },
+                {
+                    "method": "post",
+                    "code": 400,
+                    "response-file": "./test-response.html"
+                },
+                {
+                    "method": "post",
+                    "code": 400,
+                    "response-file": "./test-response.html"
+                }
+            ]
         },
         {
-            "method": "post",
-            "code": 400,
-            "response-file": "./test-response.txt"
-        },
-        {
-            "method": "post",
-            "code": 400,
-            "response": "asd"
-        },
-        {
-            "method": "post",
-            "code": 400,
-            "response-file": "./test-response.txt"
+            "endpoint": "https://google.com",
+            "requests": [
+                {
+                    "method": "post",
+                    "code": 400,
+                    "response": "asd"
+                }
+            ]
         }
     ]
 }

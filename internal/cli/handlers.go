@@ -29,7 +29,7 @@ func handleTest(cctx *cli.Context) error {
 			fmt.Printf("%d) %s: %s %s\n", i+1,
 				color.Green.Render("PASSED"), color.Blue.Render(strconv.FormatInt(r.Time, 10)), color.Blue.Render("ms"))
 		} else {
-			fmt.Printf("%d) %s: %s\n", i+1, color.Red.Render("FAILED"), color.Yellow.Render(r.Reason))
+			fmt.Printf("%d) %s: %s \n", i+1, color.Red.Render("FAILED"), color.Yellow.Render(r.Reason))
 		}
 	}
 	return nil

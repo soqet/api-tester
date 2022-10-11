@@ -3,13 +3,15 @@ package net
 import (
 	"api-tester/internal/jsonreader"
 	"bytes"
+	"net"
 	"net/http"
+	"net/http/httptrace"
 	"os"
 	"time"
 )
 
 func Exec(requests *jsonreader.MainSchema) ([]Info, error) {
-	results, err := execRequests(requests.Requests, requests.Endpoint)
+	results, err := execRequests(requests.Requests, requests.Endpoint, requests.Headers)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +20,7 @@ func Exec(requests *jsonreader.MainSchema) ([]Info, error) {
 		if g.Endpoint != "" {
 			endpoint = g.Endpoint
 		}
-		addRes, err := execRequests(g.Requests, endpoint)
+		addRes, err := execRequests(g.Requests, endpoint, g.Headers)
 		if err != nil {
 			return nil, err
 		}
@@ -27,7 +29,7 @@ func Exec(requests *jsonreader.MainSchema) ([]Info, error) {
 	return results, nil
 }
 
-func execRequests(requests []jsonreader.RequestSchema, baseEndpoint string) ([]Info, error) {
+func execRequests(requests []*jsonreader.RequestSchema, baseEndpoint string, baseHeaders []*jsonreader.HeaderSchema) ([]Info, error) {
 	result := make([]Info, len(requests))
 	for i := 0; i < len(requests); i++ {
 		result[i].Passed = true
@@ -42,12 +44,30 @@ func execRequests(requests []jsonreader.RequestSchema, baseEndpoint string) ([]I
 		if err != nil {
 			return nil, err
 		}
-		c := http.Client{}
-		start := time.Now()
+		c := http.Client{
+			Timeout: time.Second * 2,
+		}
+		var start time.Time
+		var elapsed int64
+		clientTrace := &httptrace.ClientTrace{
+			GotConn: func(_ httptrace.GotConnInfo) { start = time.Now() },
+			GotFirstResponseByte: func() { elapsed = time.Since(start).Milliseconds() },
+		}
+		r = r.WithContext(httptrace.WithClientTrace(r.Context(), clientTrace))
+		for _, h := range append(baseHeaders, req.Headers...) {
+			if http.CanonicalHeaderKey(h.Key) == "Host" {
+				r.Host = h.Value
+			}
+			r.Header.Add(h.Key, h.Value)
+		}
 		resp, err := c.Do(r)
-		elapsed := time.Since(start).Milliseconds()
 		result[i].Time = elapsed
 		if err != nil {
+			if err, ok := err.(net.Error); ok && err.Timeout() {
+				result[i].Passed = false
+				result[i].Reason = "Request timeout"
+				continue
+			}
 			return nil, err
 		}
 		if resp.StatusCode != req.Code {
@@ -60,14 +80,10 @@ func execRequests(requests []jsonreader.RequestSchema, baseEndpoint string) ([]I
 		httpBuf.ReadFrom(resp.Body)
 		testResp := []byte(req.Response)
 		if req.ResponseFile != "" {
-			file, err := os.OpenFile(req.ResponseFile, os.O_RDONLY, 0666)
+			testResp, err = readFile(req.ResponseFile)
 			if err != nil {
 				return nil, err
 			}
-			testBuf := bytes.Buffer{}
-			testBuf.ReadFrom(file)
-			file.Close()
-			testResp = testBuf.Bytes()
 		}
 		if !bytes.Equal(httpBuf.Bytes(), testResp) {
 			result[i].Passed = false
@@ -76,4 +92,16 @@ func execRequests(requests []jsonreader.RequestSchema, baseEndpoint string) ([]I
 		}
 	}
 	return result, nil
+}
+
+
+func readFile(path string) ([]byte, error) {
+	file, err := os.OpenFile(path, os.O_RDONLY, 0666)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	testBuf := bytes.Buffer{}
+	testBuf.ReadFrom(file)
+	return testBuf.Bytes(), nil
 }

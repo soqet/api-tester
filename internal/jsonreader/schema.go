@@ -3,24 +3,30 @@ package jsonreader
 type MainSchema struct {
 	// api endpoint
 	Endpoint string `json:"endpoint"`
+	// headers which will be setted for all requests
+	Headers []*HeaderSchema `json:"headers"`
 	// groups of requests
-	Groups []GroupSchema `json:"groups"`
+	Groups []*GroupSchema `json:"groups"`
 	// requests without groups
-	Requests []RequestSchema `json:"requests"`
+	Requests []*RequestSchema `json:"requests"`
 }
 
 type GroupSchema struct {
-	// group name
-	Name string `json:"name"`
 	// endpoint overwrite for group
 	Endpoint string `json:"endpoint"`
+	// header overwrites
+	// overwrite main headers if specified
+	Headers []*HeaderSchema `json:"headers"`
 	// requests of group
-	Requests []RequestSchema `json:"requests"`
+	Requests []*RequestSchema `json:"requests"`
 }
 
 type RequestSchema struct {
 	// http method, may be capitalized
 	Method string `json:"method"`
+	// additional headers for this request
+	// added to the main or group headers
+	Headers []*HeaderSchema `json:"headers"`
 	// endpoint overwrite for request
 	Endpoint string `json:"endpoint"`
 	// requested resourse.
@@ -36,4 +42,9 @@ type RequestSchema struct {
 	Response string `json:"response"`
 	// file containing response
 	ResponseFile string `json:"response-file"`
+}
+
+type HeaderSchema struct {
+	Key string `json:"key"`
+	Value string  `json:"value"`
 }
